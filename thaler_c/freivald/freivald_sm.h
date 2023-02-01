@@ -1,0 +1,1 @@
+int freivald_sm(int **Matrix);
