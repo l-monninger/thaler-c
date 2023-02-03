@@ -16,4 +16,8 @@ typedef struct IntMatrix {
 typedef int (*free_r)(void*);
 
 // members
-int malloc_matrix(size_t dims[2], Matrix *result, size_t size);
+int malloc_matrix(size_t dims[2], Matrix **result, size_t size);
+int calloc_matrix(size_t dims[2], Matrix **result, size_t size);
+int gat(Matrix *M, size_t dims[2], void ***result);
+int sat(Matrix *M, size_t dims[2], void *value);
+

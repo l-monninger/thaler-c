@@ -2,6 +2,9 @@ cc_library(
     name = "matrix",
     srcs = ["matrix.c"],
     hdrs = ["matrix.h"],
+    deps = [
+        "//thaler_c/util/tha_error:tha_error"
+    ]
 )
 
 cc_test(

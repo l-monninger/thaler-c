@@ -5,18 +5,25 @@ extern "C" {
 #include "stdlib.h"
 #include "stddef.h"
 
-// Demonstrate some basic assertions.
-TEST(HelloTest, BasicAssertions) {
-  // Expect two strings not to be equal.
-  EXPECT_STRNE("hello", "world");
-  // Expect equality.
-  EXPECT_EQ(7 * 6, 42);
-}
-
 TEST(CreatesMatrix, BasicAssertions){
 
-    Matrix *result = NULL;
-    size_t dims[2] = {4, 4};
-    malloc_matrix(dims, result, 1);
+  Matrix *M = NULL;
+  size_t dims[2] = {4, 4};
+  calloc_matrix(dims, &M, sizeof(int));
+
+  void **entry = NULL;
+  size_t pos[2] = {0, 0};
+  int res = gat(M, pos, &entry);
+  EXPECT_EQ( *(int *)entry, 0);
+
+  // mutate in place
+  *entry = (void *) 2;
+  void **second_entry = NULL;
+  int another_res = gat(M, pos, &second_entry);
+  EXPECT_EQ( *(int *)second_entry, 2);
+
+  // set
+  int set_res = sat(M, pos, (void *) 3);
+  EXPECT_EQ( *(int *)second_entry, 3);
 
 }
