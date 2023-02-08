@@ -36,7 +36,9 @@ enum ThaErrno {
   THA_ETOLF    = 29,  /* cannot reach the specified tolerance in F */
   THA_ETOLX    = 30,  /* cannot reach the specified tolerance in X */
   THA_ETOLG    = 31,  /* cannot reach the specified tolerance in gradient */
-  THA_EOF      = 32   /* end of file */
+  THA_EOF      = 32,   /* end of file */
+  THA_NULLPTR = 0x7e50, /* null pointer where a valid pointer was required */
+  THA_FREE = 0xf5ee, /* Failure to to free dynamically allocated memory. */
 };
 
 #define SUC \
@@ -50,9 +52,21 @@ enum ThaErrno {
  */
 #define THROW(tha_errno, label, reason) \
     do { \
-        tha_error (tha_errno, label, reason, __FILE__, __LINE__) ; \
+        tha_error (tha_errno, __func__,  __FILE__, __LINE__, label, reason) ; \
         return tha_errno; \
     } while (0)
+
+#define TRACE(flag, call) \
+    do { \
+        flag = call; \
+        if(flag) THROW(flag, "TRACE", "RAISE"); \
+    } while(0)
+
+#define MARK(flag, call, label, reason) \
+    do { \
+        flag = call; \
+        if(flag) THROW(flag, label, reason); \
+    } while(0)
 
 /**
  * @brief 
@@ -65,9 +79,10 @@ enum ThaErrno {
  */
 int tha_error (
     enum ThaErrno tha_errno,
-    const char *label,
-    const char *reason, 
+    const char *func,
     const char *file, 
-    int line
+    int line,
+    const char *label,
+    const char *reason
 );
 

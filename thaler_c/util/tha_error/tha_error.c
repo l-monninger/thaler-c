@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include "error.h"
+#include "tha_error.h"
 
 /**
  * @brief 
@@ -13,13 +13,14 @@
  */
 int tha_error (
     enum ThaErrno tha_errno,
-    const char *label,
-    const char *reason, 
+    const char *func,
     const char *file, 
-    int line
+    int line,
+    const char *label,
+    const char *reason
 ){
 
-    int err = fprintf(stderr, "thaler (%d): %s:%d: %s: %s\n", tha_errno, file, line, label, reason);
+    int err = fprintf(stderr, "thaler (%d) in %s at %s:%d: %s: %s\n", tha_errno, func, file, line, label, reason);
     if(err < 0){
         abort();
         return THA_FAILURE;

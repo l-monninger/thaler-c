@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 extern "C" {
-    #include "error.h"
+    #include "tha_error.h"
 }
 #include "stdlib.h"
 #include "stddef.h"
