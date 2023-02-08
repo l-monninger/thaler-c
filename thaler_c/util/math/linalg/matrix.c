@@ -1,7 +1,7 @@
 #include "matrix.h"
+#include "thaler_c/util/tha_error/tha_error.h"
 #include <stdlib.h>
 #include <stdio.h>
-#include "thaler_c/util/tha_error/tha_error.h"
 
 /**
  * @brief Mallocs a matrix with the provided dimensions.
@@ -21,7 +21,7 @@ int malloc_matrix(size_t dims[2], Matrix **result, size_t size){
     (*result)->dims[1] = width;
     (*result)->values = values;
 
-    return 0;
+    SUC;
 
 }
 
@@ -43,7 +43,7 @@ int calloc_matrix(size_t dims[2], Matrix **result, size_t size){
     (*result)->dims[1] = width;
     (*result)->values = values;
 
-    return 0;
+    SUC;
 
 }
 
@@ -61,13 +61,19 @@ int free_matrix(Matrix *M, free_r free_value){
 
 
     for( ; iter; ++iter){
+
         flag = free_value(*iter);
-        if(flag) return -1; // TODO: include Error handling
+        if(flag) THROW(
+            THA_FREE, 
+            "FAILED_MATRIX_MEMBER_FREE", 
+            "Could not free matrix member."
+        );
+
     }
 
     free(M);
 
-    return 0;
+    SUC;
 
 }
 
@@ -81,7 +87,11 @@ int free_matrix(Matrix *M, free_r free_value){
  */
 int gat(Matrix *M, size_t dims[2], void ***result){
 
-    if(!M) return -1; // TODO: update with error
+    if(!M) THROW(
+        THA_NULLPTR, 
+        "MATRIX_NULLPTR", 
+        "A pointer to a Matrix is required to get at (gat) an index."
+    ); // TODO: update with error
 
     size_t height = M->dims[0];
     size_t width = M->dims[1];
@@ -89,11 +99,15 @@ int gat(Matrix *M, size_t dims[2], void ***result){
     size_t n = dims[1];
 
     if(m < 0 || n < 0 || m > (height - 1) || n > (width - 1)) 
-        return -2; // TODO: Update to error.
+        THROW(
+            THA_EDOM,
+            "MATRIX_INDEX_OBE",
+            "The provided matrix index is out of bounds."
+        );
 
     *result = M->values + ((m * width) + n);
 
-    return 0;
+    SUC;
 
 }
 
@@ -107,13 +121,18 @@ int gat(Matrix *M, size_t dims[2], void ***result){
  */
 int sat(Matrix *M, size_t dims[2], void *value){
 
+    int flag;
     void **ptr = NULL; 
-    int res = gat(M, dims, &ptr);
 
-    if(res != 0)
-        return -1; // TODO: Update to error handling.
+    MARK(
+        flag,
+        gat(M, dims, &ptr),
+        "SAT_COULD_NOT_GAT",
+        "Could not set at index because could not get pointer to index."
+    );
 
     *ptr = value;
-    return res;
+    
+    SUC;
 
 }
