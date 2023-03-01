@@ -1,5 +1,7 @@
 #include "matrix.h"
 #include "thaler_c/util/tha_error/tha_error.h"
+#include "thaler_c/util/math/set/field/field.h"
+#include "thaler_c/util/math/set/field/int_field.h"
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -11,7 +13,12 @@
  * @param size 
  * @return int 
  */
-int malloc_matrix(size_t dims[2], Matrix **result, size_t size){
+int malloc_matrix(
+    size_t dims[2], 
+    Matrix **result, 
+    size_t size, 
+    Field *field
+){
 
     size_t height = dims[0];
     size_t width = dims[1];
@@ -20,6 +27,21 @@ int malloc_matrix(size_t dims[2], Matrix **result, size_t size){
     (*result)->dims[0] = height;
     (*result)->dims[1] = width;
     (*result)->values = values;
+
+    if(field){ // if we've been given a field
+
+        // unwrap the set
+        (*result)->contains = field->contains;
+        (*result)->equals = field->equals;
+
+        // unwrap the field
+        (*result)->add = field->add;
+        (*result)->subtract = field->subtract;
+        (*result)->multiply = field->multiply;
+        (*result)->divide = field->divide;   
+    } else { // otherwise assume R
+
+    }
 
     SUC;
 

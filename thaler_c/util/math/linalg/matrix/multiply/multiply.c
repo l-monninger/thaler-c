@@ -1,4 +1,3 @@
-#include "matrix.h"
 #include "multiply.h"
 #include "thaler_c/util/tha_error/tha_error.h"
 
@@ -29,18 +28,33 @@ int mat_mult(Matrix *M, Matrix *N, Matrix *result){
  */
 int mat_mult_vec(Matrix *M, void **vec, void **result){
 
-    int sum;
+    void *sum;
+    void *term;
     int flag;
     size_t pos[2] = {0, 0};
     void **val;
 
     for(int i = 0; i < M->dims[0] ;++i){
-        sum = 0;
+
+        // zero out the sum
+        MARK(
+            flag,
+            M->get_zero(&sum),
+            "ZERO_ERROR",
+            "Failed to get a zero for the matrix in the field."
+        );
+
+        // 1. SCALAR_MULTIPLY: all of the terms in the in your row by the scalar in position i of your vector.
+
+        // 2. VECTOR_SUM: all of the terms in the resulting vector above
+
+
         for(int j = 0; M->dims[1]; ++j){
 
             pos[0] = i;
             pos[1] = j;
 
+            // get the value at the position
             MARK(
                 flag,
                 gat(M, pos, &val),
@@ -48,7 +62,21 @@ int mat_mult_vec(Matrix *M, void **vec, void **result){
                 "Failed to get value of matrix at index while multiply by vector."
             );
 
-            sum += ((int) *val) * ((int) vec[j]);
+            // multiply the value by the corresponding index in j
+            MARK(
+                flag,
+                M->multiply(val, vec[j], &term),
+                "MULTIPLICATION_ERROR",
+                "Failed to multiply two values from the field."
+            );
+
+            // add the value to the sum
+            MARK(
+                flag,
+                M->add(sum, term, &sum),
+                "ADDITION_ERROR",
+                "Failed to add two values from the field."
+            );
 
         }
 

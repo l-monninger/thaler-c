@@ -20,13 +20,13 @@ int tha_error (
     const char *reason
 ){
 
-    int err = fprintf(stderr, "thaler (%d) in %s at %s:%d: %s: %s\n", tha_errno, func, file, line, label, reason);
-    if(err < 0){
+    int err = fprintf(stderr, "tha_error(%d) in {%s} at [%s:%d] #%s: %s\n", tha_errno, func, file, line, label, reason);
+    if(err < 0){ // if you can't write to stderr, that's an irrecoverable problem
         abort();
         return THA_FAILURE;
     }
     err = fflush(stderr);
-    if(err != 0) {
+    if(err != 0) { // if you can't flush stderr, that's an irrecoverable problem
         abort();
         return THA_FAILURE;
     }

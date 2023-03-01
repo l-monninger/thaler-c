@@ -1,8 +1,15 @@
+#pragma once
 #include "stddef.h"
+#include "thaler_c/util/math/set/field/field.h"
+#include "thaler_c/util/math/category/get.h"
 
-#define Matrixlike(type) \
+#define Matrixlike(typename) \
+    Fieldlike(typename) \
     size_t dims[2]; \
-    type* values;
+    typename* values; \
+    MUTG0(get_zero, typename); \
+    MUTG0(get_one, typename);
+
 
 typedef struct Matrix {
     Matrixlike(void*)
